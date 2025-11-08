@@ -22,53 +22,6 @@ with the Apache DataFusion query engine.
 
 ---
 
-## How to run?
-
-Prerequisites:
-
-- Working Java environment
-- Git to clone the project
-
-To run this project, follow these steps:
-
-1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/jorisgillis/arrow-flightsql-java
-   cd arrow-flightsql-java
-   ```
-
-2. **Build the project:**
-   Ensure you have Java and Maven installed. Then, build the project using:
-   ```bash
-   mvn clean install
-   ```
-
-3. **Run the application:**
-   Execute the main class to start the server:
-   ```bash
-   JDK_JAVA_OPTIONS="--add-reads=org.apache.arrow.flight.core=ALL-UNNAMED --add-opens=java.base/java.nio=org.apache.arrow.memory.core,ALL-UNNAMED" \
-   mvn spring-boot:run
-   ```
-
-   The `JDK_JAVA_OPTIONS` tell the JDK to open up some of the modules to all
-   unnamed modules. This project is an unnamed module and needs access to
-   `flight.core` and `arrow.memory`.
-
-
-4. **Connect to the server:**
-   A HTTP API is available on [http://localhost:8080](http://localhost:8080). Or
-   you can connect with a FlightSQLClient from somewhere else.
-
-The HTTP API has three endpoints:
-
-| API call                            | Description                                  |
-|-------------------------------------|----------------------------------------------|
-| GET  http://localhost:8080/tables   | Lists all the tables in the database         |
-| POST http://localhost:8080/generate | Generates a random table, table name in body |
-| POST http://localhost:8080/query    | Executes the query as a string in the body   |
-
----
-
 ## How does Apache Arrow FlightSQL work?
 
 [Apache Arrow Flight SQL](arrow-flight-sql-java) is pulls Arrow into the heart
@@ -102,15 +55,15 @@ efficient, cross-platform, cross-programming language way. A conversation
 between client and server typically follows this pattern:
 
 1. Client requests **FlightInfo** from the server with a **FlightDescriptor**:
-the flight info contains the *endpoints* and *tickets* that the client can use
-to fetch data from the server(s). Indeed, the endpoints can point to different
-and/or mulitple servers.
+   the flight info contains the *endpoints* and *tickets* that the client can use
+   to fetch data from the server(s). Indeed, the endpoints can point to different
+   and/or mulitple servers.
 
 2. The client requests a **stream** based on the *endpoint (where?)* and the *ticket
    (what?)•.
 
 3. The server sends a **stream of VectorSchemaRoots** (in Java; in Rust and
-Python this would be RecordBatches), which the client accepts.
+   Python this would be RecordBatches), which the client accepts.
 
 A client can send data to the server using a **FlightDescriptor** and the
 **acceptPut** function on the server. The descriptor describes the stream that
@@ -289,59 +242,59 @@ functions, to get to a working Flight SQL server:
  * Return a list of FlightEndpoints for the given request and FlightDescriptor. This method should
  * validate that the request is supported by this FlightSqlProducer.
  */
- @Override
- protected <T extends Message> List<FlightEndpoint> determineEndpoints(
-     T request,
-     FlightDescriptor flightDescriptor,
-     Schema schema
- ) {
-     // This implementation converts a descriptor into a ticket that will then need to be
-     // handled by the `getStream...` function.
-     return List.of(
-         FlightEndpoint.builder(
-             new Ticket(flightDescriptor.getCommand()),
-             location
-         ).build()
-     );
- }
+@Override
+protected <T extends Message> List<FlightEndpoint> determineEndpoints(
+        T request,
+        FlightDescriptor flightDescriptor,
+        Schema schema
+) {
+    // This implementation converts a descriptor into a ticket that will then need to be
+    // handled by the `getStream...` function.
+    return List.of(
+            FlightEndpoint.builder(
+                    new Ticket(flightDescriptor.getCommand()),
+                    location
+            ).build()
+    );
+}
 
-  /**
-   * Returns data for catalogs based data stream.
-   *
-   * @param context Per-call context.
-   * @param listener An interface for sending data back to the client.
-   */
-  void getStreamCatalogs(CallContext context, ServerStreamListener listener);
+/**
+ * Returns data for catalogs based data stream.
+ *
+ * @param context Per-call context.
+ * @param listener An interface for sending data back to the client.
+ */
+void getStreamCatalogs(CallContext context, ServerStreamListener listener);
 
-  /**
-   * Returns data for schemas based data stream.
-   *
-   * @param command The command to generate the data stream.
-   * @param context Per-call context.
-   * @param listener An interface for sending data back to the client.
-   */
-  void getStreamSchemas(
-      CommandGetDbSchemas command, CallContext context, ServerStreamListener listener);
+/**
+ * Returns data for schemas based data stream.
+ *
+ * @param command The command to generate the data stream.
+ * @param context Per-call context.
+ * @param listener An interface for sending data back to the client.
+ */
+void getStreamSchemas(
+        CommandGetDbSchemas command, CallContext context, ServerStreamListener listener);
 
-  /**
-   * Returns data for tables based data stream.
-   *
-   * @param command The command to generate the data stream.
-   * @param context Per-call context.
-   * @param listener An interface for sending data back to the client.
-   */
-  void getStreamTables(
-      CommandGetTables command, CallContext context, ServerStreamListener listener);
+/**
+ * Returns data for tables based data stream.
+ *
+ * @param command The command to generate the data stream.
+ * @param context Per-call context.
+ * @param listener An interface for sending data back to the client.
+ */
+void getStreamTables(
+        CommandGetTables command, CallContext context, ServerStreamListener listener);
 
-  /**
-   * Returns data for a SQL query based data stream.
-   *
-   * @param ticket Ticket message containing the statement handle.
-   * @param context Per-call context.
-   * @param listener An interface for sending data back to the client.
-   */
-  void getStreamStatement(
-      TicketStatementQuery ticket, CallContext context, ServerStreamListener listener);
+/**
+ * Returns data for a SQL query based data stream.
+ *
+ * @param ticket Ticket message containing the statement handle.
+ * @param context Per-call context.
+ * @param listener An interface for sending data back to the client.
+ */
+void getStreamStatement(
+        TicketStatementQuery ticket, CallContext context, ServerStreamListener listener);
 ```
 
 This basic implementation does not support table types, sql info, prepared
@@ -373,8 +326,8 @@ It has many caveats:
   case).
 
 - It computes a query when a ticket is provided. Typically the query is computed
-during the `getFlightInfoStatement` function is executed, given back endpoint(s)
-and ticket(s) where the result set can be fetched.
+  during the `getFlightInfoStatement` function is executed, given back endpoint(s)
+  and ticket(s) where the result set can be fetched.
 
 - There are no transactions.
 
@@ -391,9 +344,58 @@ Other implementations of the Flight SQL:
 
 - [FlightSqlClientDemoApp.java](https://github.com/apache/arrow-java/blob/main/flight/flight-sql/src/main/java/org/apache/arrow/flight/sql/example/FlightSqlClientDemoApp.java)
 - [FlightSqlScenarioProducer.java](https://github.com/apache/arrow-java/blob/main/flight/flight-integration-tests/src/main/java/org/apache/arrow/flight/integration/tests/FlightSqlScenarioProducer.java#L731)
-- Time series database [InfluxDB3](https://docs.influxdata.com/influxdb3/core/reference/client-libraries/flight/java-flightsql/) implements Flight SQL server (in Rust).
+- Time series
+  database [InfluxDB3](https://docs.influxdata.com/influxdb3/core/reference/client-libraries/flight/java-flightsql/)
+  implements Flight SQL server (in Rust).
 - [SQLite wrapper in C++](https://github.com/voltrondata/sqlflite)
 - [DuckDB wrapper in C++](https://github.com/ClearTax/flight-duckdb-server)
+
+---
+
+## How to run?
+
+Prerequisites:
+
+- Working Java environment
+- Git to clone the project
+
+To run this project, follow these steps:
+
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/jorisgillis/arrow-flightsql-java
+   cd arrow-flightsql-java
+   ```
+
+2. **Build the project:**
+   Ensure you have Java and Maven installed. Then, build the project using:
+   ```bash
+   mvn clean install
+   ```
+
+3. **Run the application:**
+   Execute the main class to start the server:
+   ```bash
+   JDK_JAVA_OPTIONS="--add-reads=org.apache.arrow.flight.core=ALL-UNNAMED --add-opens=java.base/java.nio=org.apache.arrow.memory.core,ALL-UNNAMED" \
+   mvn spring-boot:run
+   ```
+
+   The `JDK_JAVA_OPTIONS` tell the JDK to open up some of the modules to all
+   unnamed modules. This project is an unnamed module and needs access to
+   `flight.core` and `arrow.memory`.
+
+
+4. **Connect to the server:**
+   A HTTP API is available on [http://localhost:8080](http://localhost:8080). Or
+   you can connect with a FlightSQLClient from somewhere else.
+
+The HTTP API has three endpoints:
+
+| API call                            | Description                                  |
+|-------------------------------------|----------------------------------------------|
+| GET  http://localhost:8080/tables   | Lists all the tables in the database         |
+| POST http://localhost:8080/generate | Generates a random table, table name in body |
+| POST http://localhost:8080/query    | Executes the query as a string in the body   |
 
 ---
 

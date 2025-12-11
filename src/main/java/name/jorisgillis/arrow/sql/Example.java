@@ -221,7 +221,7 @@ public class Example {
              * <p>This example does not showcase all possibilities of the Producer, but it does
              * showcase the most important ones.
              */
-            private class ExampleProducer extends BasicFlightSqlProducer {
+            class ExampleProducer extends BasicFlightSqlProducer {
                 private final Map<String, Path> tablePaths = new HashMap<>();
 
                 private final RootAllocator rootAllocator =

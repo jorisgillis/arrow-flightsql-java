@@ -18,17 +18,20 @@
 package name.jorisgillis.arrow.sql.client.exception;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ControllerAdvice
 public class ExceptionHandlingConfiguration {
 
     @ExceptionHandler(FlightException.class)
     public ResponseEntity<ErrorResponse> handleFlightStreamException(FlightException ex) {
-        return new ResponseEntity<>(
-                new ErrorResponse(ex.getErrorCode(), "Internal Server Error: %s".formatted(ex)),
-                HttpStatus.INTERNAL_SERVER_ERROR);
+        return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .contentType(MediaType.APPLICATION_JSON)  // Add this line
+                .body(new ErrorResponse(ex.getErrorCode(), "Internal Server Error: %s".formatted(ex)));
     }
 }

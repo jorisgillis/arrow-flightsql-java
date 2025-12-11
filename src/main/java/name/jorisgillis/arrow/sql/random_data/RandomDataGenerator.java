@@ -27,14 +27,17 @@ public class RandomDataGenerator {
 
     public void generate(VectorSchemaRoot root, int rowCount) {
         for (FieldVector vector : root.getFieldVectors()) {
-            switch (vector) {
-                case IntVector valueVectors -> generateIntData(valueVectors, rowCount);
-                case Float4Vector valueVectors -> generateFloatData(valueVectors, rowCount);
-                case Float8Vector valueVectors -> generateDoubleData(valueVectors, rowCount);
-                case VarCharVector valueVectors -> generateVarCharData(valueVectors, rowCount);
-                default ->
-                        throw new IllegalArgumentException(
-                                "Unsupported vector type: " + vector.getClass().getName());
+            if (vector instanceof IntVector) {
+                generateIntData((IntVector) vector, rowCount);
+            } else if (vector instanceof Float4Vector) {
+                generateFloatData((Float4Vector) vector, rowCount);
+            } else if (vector instanceof Float8Vector) {
+                generateDoubleData((Float8Vector) vector, rowCount);
+            } else if (vector instanceof VarCharVector) {
+                generateVarCharData((VarCharVector) vector, rowCount);
+            } else {
+                throw new IllegalArgumentException(
+                        "Unsupported vector type: " + vector.getClass().getName());
             }
         }
 

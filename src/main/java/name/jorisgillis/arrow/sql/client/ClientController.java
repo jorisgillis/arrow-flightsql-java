@@ -17,37 +17,37 @@
 
 package name.jorisgillis.arrow.sql.client;
 
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import java.util.List;
-
 @Controller
 public class ClientController {
-    private final ClientService clientService;
+  private final ClientService clientService;
 
-    @Autowired
-    public ClientController(ClientService clientService) {
-        this.clientService = clientService;
-    }
+  @Autowired
+  public ClientController(ClientService clientService) {
+    this.clientService = clientService;
+  }
 
-    @GetMapping("/tables")
-    public ResponseEntity<List<Table>> listTables() {
-        return ResponseEntity.ok(clientService.listTables());
-    }
+  @GetMapping(path = "/tables", produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<List<Table>> listTables() {
+    return ResponseEntity.ok(clientService.listTables());
+  }
 
-    @PostMapping("/generate")
-    public ResponseEntity<String> generate(@RequestBody String tableName) {
-        clientService.writeGeneratedData(tableName);
-        return ResponseEntity.accepted().build();
-    }
+  @PostMapping(path = "/generate", produces = MediaType.TEXT_PLAIN_VALUE)
+  public ResponseEntity<String> generate(@RequestBody String tableName) {
+    clientService.writeGeneratedData(tableName);
+    return ResponseEntity.accepted().build();
+  }
 
-    @PostMapping("/query")
-    public ResponseEntity<String> executeQuery(@RequestBody String query) {
-        return ResponseEntity.ok().body(clientService.executeQuery(query));
-    }
+  @PostMapping(path = "/query", produces = MediaType.TEXT_PLAIN_VALUE)
+  public ResponseEntity<String> executeQuery(@RequestBody String query) {
+    return ResponseEntity.ok().body(clientService.executeQuery(query));
+  }
 }

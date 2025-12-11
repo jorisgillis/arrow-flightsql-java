@@ -88,11 +88,6 @@ public class ClientServiceIT {
 
         String result = clientService.executeQuery("SELECT COUNT(*) FROM 'query-001'");
 
-        assertThat(result)
-                .isEqualTo(
-"""
-COUNT(UInt8(1))
-10000
-""");
+        assertThat(result).isEqualTo("COUNT(UInt8(1))\n" + "10000");
     }
 }
